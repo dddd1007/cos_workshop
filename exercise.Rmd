@@ -1,0 +1,75 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+# 0. 载入包
+```{r}
+library(tidyverse)
+library(here)
+```
+
+# 1. 读取数据
+```{r}
+readLines(here("data", "sub01.log")) %>% 
+  str_detect("RT") %>% 
+  which() -> table2_start
+
+readLines(here("data", "sub01.log")) %>% 
+  str_detect("Subject") %>% 
+  which() -> table1_start
+
+table1_end <- table2_start - 2
+table2_end <- length(readLines(here("data", "sub01.log")))
+
+raw_text <- readLines(here("data", "sub01.log"))
+
+writeLines(raw_text[table1_start:table1_end], here("output", "sub01_table1.txt"))
+```
+
+```{r}
+readLines(here("data", "sub02.log")) %>% 
+  str_detect("RT") %>% 
+  which() -> table2_start
+
+readLines(here("data", "sub02.log")) %>% 
+  str_detect("Subject") %>% 
+  which() -> table1_start
+
+table1_end <- table2_start - 2
+table2_end <- length(readLines(here("data", "sub02.log")))
+
+raw_text <- readLines(here("data", "sub02.log"))
+
+writeLines(raw_text[table1_start:table1_end], here("output", "sub02_table1.txt"))
+
+convert_logfile <- function(filename, output_name) {
+  readLines(here("data", filename)) %>% 
+  str_detect("RT") %>% 
+  which() -> table2_start
+
+  readLines(here("data", filename)) %>% 
+    str_detect("Subject") %>% 
+    which() -> table1_start
+  
+  table1_end <- table2_start - 2
+  table2_end <- length(readLines(here("data", filename)))
+  
+  raw_text <- readLines(here("data", filename))
+  
+  writeLines(raw_text[table1_start:table1_end], here("output", output_name))
+}
+
+# 循环
+convert_logfile("sub02.log", "sub02_table1.txt")
+
+subs <- c("sub01", "sub02")
+for (i in subs) {
+  filename <- paste0(i,".log")
+  output_name <- paste0(i, "_table1_new.txt")
+  convert_logfile(filename, output_name)
+}
+
+
+subs
+```
+
